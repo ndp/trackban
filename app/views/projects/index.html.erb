@@ -1,0 +1,17 @@
+<h1>Trackban</h1>
+
+<div ng-controller="TrackbanCtrl">
+  <form ng-submit="addStory()">
+    <input type="text" ng-model="newStory.name">
+    <input type="submit" value="Add">
+  </form>
+
+  <ul>
+    <li ng-repeat="story in stories">
+      {{story.name}}
+      <span ng-show="story.winner" ng-class="{highlight: story == lastWinner}" class="winner">WINNER</span>
+    </li>
+  </ul>
+  
+  <button ng-click="drawWinner()">Draw Winner</button>
+</div>
