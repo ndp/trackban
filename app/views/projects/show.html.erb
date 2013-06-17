@@ -1,2 +1,120 @@
-<h1>Projects#show</h1>
-<p>Find me in app/views/projects/show.html.erb</p>
+<script type="text/javascript">
+  var h2ht = 30;
+  Csster.style({
+    html: {
+      'font-family': 'verdana',
+      'overflow': 'scroll',
+      'height': '100%'
+    },
+    body: {
+      margin: '0',
+      padding: '0',
+      'height': '100%'
+    },
+    'h2': {
+      margin: '0',
+      'font-size': 'x-small',
+      'background-color': 'black',
+      color: 'white',
+      width: '100%',
+      padding: '0 20px',
+      height: h2ht,
+      lineHeight: h2ht,
+      opacity: .6
+
+    },
+    'body.past-pinned section#past,body.present-pinned section#present,body.future-pinned section#future,body.undefined-pinned section#undefined': { borderTopWidth: h2ht, borderColor: '#999'},
+    section: {
+      margin: '0',
+      'background-color': '#eee',
+      padding: '0 0 0 0',
+      include: clearfix()
+
+    },
+    article: {
+      display: 'table-cell',
+      padding: '0 1%',
+      'max-width': 400,
+      borderLeft: '1px solid #999',
+      borderRight: '1px solid #999',
+      paddingTop: 0
+    },
+    'article:last-child': {
+      width: '*',
+      'max-width': 4000
+    },
+    'article h3': {
+      'font-size': 'x-small',
+      padding: 3, margin: 0,
+      backgroundColor: '#333',
+      color: '#999'
+    },
+    'article h4, article p': {
+      'font-size': 'x-small',
+      padding: '2px 10px'
+    },
+    '#past': {
+      'background-color': 'black',
+      article: {
+        'background-color': '#111',
+        'color': '#999',
+      }
+    },
+    '#present': {
+      'background-color': 'lightgreen',
+
+    },
+    '#future': {
+      'background-color': 'lightviolet',
+
+    },
+    '#undefined': {
+      'background-color': 'lightgray',
+
+    }
+  });
+
+
+</script>
+
+
+<div ng-app="Trackban" ng-controller="TrackbanCtrl">
+  <section id="{{epoch.name}}" ng-repeat="epoch in epochs">
+    <h2 id="{{epoch.name}}-hd">{{epoch.name}}</h2>
+    <article ng-repeat="theme in epoch.themes">
+      <h3>{{theme}}</h3>
+
+      <div ng-repeat="story in epoch.stories | filter: {theme: theme}">
+        <h4>{{story.summary}}</h4>
+        <!--<p>{{story.actions[0].note}}</p>-->
+      </div>
+    </article>
+  </section>
+
+</div>
+
+
+
+
+<script type="text/javascript">
+  setTimeout(function () {
+    $('#past-hd').fixie({pinnedBodyClass: 'past-pinned', topMargin: 0});
+    $('#present-hd').fixie({
+      topMargin: h2ht,
+      bottomMargin: h2ht * 2,
+      pinSlop: 5,
+      pinnedBodyClass: 'present-pinned'
+    });
+    $('#past-hd').fixie({
+      topMargin: h2ht * 2,
+      bottomMargin: h2ht * 1,
+      pinSlop: -10,
+      pinnedBodyClass: 'future-pinned'});
+    $('#undefined-hd').fixie({
+      topMargin: h2ht * 3,
+      bottomMargin: 0,
+      pinSlop: -20,
+      pinnedBodyClass: 'undefined-pinned'
+    });
+  }, 3000);
+</script>
