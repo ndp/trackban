@@ -4,6 +4,7 @@ class Project
   field :name, type: String
   field :valid_estimates, type: Array
   has_many :stories
+  has_many :milestones
   embeds_many :workers
   embeds_one :workflow
   field :past_states, type: Array

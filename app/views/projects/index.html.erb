@@ -1,10 +1,19 @@
 <h1>Trackban</h1>
 
 
-<div ng-app="Trackban" ng-controller="TrackbanCtrl">
+<div ng-app="Trackban" ng-controller="ProjectListCtrl">
   <ul>
     <li ng-repeat="project in projects">
       <a href="/projects/{{project._id}}">{{project.name}}</a>
     </li>
   </ul>
+</div>
+
+<div>
+  <h2>Import Project from Pivotal Tracker</h2>
+  <%= form_for Project.new do |f| %>
+    <label>Pivotal Tracker Project ID</label>
+    <input name="project_id">
+    <button>Import</button>
+  <% end %>
 </div>

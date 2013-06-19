@@ -7,72 +7,100 @@ require 'pp'
 
 class PivotalTrackerImporter
 
-  def initialize(project_id)
-    @project_id = project_id
+  def initialize(tracker_project_id)
+    @tracker_project_id = tracker_project_id
   end
 
-  attr_reader :project_id
+  attr_reader :tracker_project_id
 
   def import
+    new_project = fetch_project
 
-    uri = URI.parse("http://www.pivotaltracker.com/services/v3/projects/#{project_id}")
+    fetch_stories(new_project)
+
+    new_project
+  end
+
+  def fetch_project
+    uri = URI.parse("http://www.pivotaltracker.com/services/v3/projects/#{tracker_project_id}")
     response = Net::HTTP.start(uri.host, uri.port) do |http|
       http.get(uri.path, {'X-TrackerToken' => ENV['TOKEN']})
     end
     doc = Nokogiri::Slop(response.body)
-    p = Project.new(states: %w{unscheduled unstarted in_progress delivered finished accepted},
-                    past_states: %w{accepted},
-                    present_states: %w{in_progress delivered finished},
-                    future_states: %w{unstarted}) do |p|
+    existing_project = Project.where(id: "pivotal-tracker-#{tracker_project_id}").first
+    project = existing_project || Project.new(states: %w{unscheduled unstarted in_progress delivered finished accepted},
+                                              past_states: %w{accepted},
+                                              present_states: %w{in_progress delivered finished},
+                                              future_states: %w{unstarted}) do |p|
       p.id = 'pivotal-tracker-' << doc.project.id.content
-      p.name = doc.css('project').first.content
-      p.valid_estimates = doc.project.point_scale.content.split(',')
-      doc.project.memberships.membership.each do |m|
-        w = Worker.new name: m.css("name").first.content,
-                       handle: m.person.initials.content,
-                       email: m.person.email.content
-        p.workers << w
-      end
     end
-    p.save!
+    project.name = doc.project.css('name').first.content
+    project.valid_estimates = doc.project.point_scale.content.split(',')
+    project.workers = []
+    doc.project.memberships.membership.each do |m|
+      w = Worker.new name: m.css("name").first.content,
+                     handle: m.person.initials.content,
+                     email: m.person.email.content
+      project.workers << w
+    end
 
-    uri = URI.parse("http://www.pivotaltracker.com/services/v3/projects/#{project_id}/stories")
+    project.save!
+    pp first: project
+    project.reload
+    pp reloaded: project
+    project
+  end
+
+  def fetch_stories(project)
+    uri = URI.parse("http://www.pivotaltracker.com/services/v3/projects/#{tracker_project_id}/stories")
     response = Net::HTTP.start(uri.host, uri.port) do |http|
       http.get(uri.path, {'X-TrackerToken' => ENV['TOKEN']})
     end
     doc = Nokogiri::Slop(response.body)
 
-    states = []
-    doc.stories.story.each_with_index do |story, index|
-      s = Story.new summary: story.css('name').first.content,
-                    tags: [story.story_type.content],
-                    project: p,
-                    current_state: story.current_state.content
-      s.id= "pivotal-tracker-story-#{story.css('id').first.content}"
-      s.current_estimate = story.css('estimate').first.try(:content)
-      s.created_at = story.css('created_at').first.content
-      labels = story.css('labels').first.try(:content)
-      s.tags.unshift *labels.split(',') unless labels.blank?
-      s.theme = s.tags.size > 1 ? s.tags[0] : 'undefined'
-      unless story.description.blank?
-        s.actions << (Action.new note: story.description)
+
+    doc.stories.story.each do |node|
+      if node.story_type.content == 'release'
+        milestone = Milestone.new name: node.css('name').first.content,
+                                  project: project,
+                                  current_state: node.current_state.content
+        milestone.id = "pivotal-tracker-story-#{node.css('id').first.content}"
+        milestone.save!
+        project.milestones << milestone
+      end
+    end
+    project.milestones << Milestone.new(name: 'End of Project', project: project)
+
+    milestone_index = 0
+    doc.stories.story.each_with_index do |node, index|
+      milestone_index += 1 and next if node.story_type.content == 'release'
+      story = Story.new summary: node.css('name').first.content,
+                        tags: [node.story_type.content],
+                        project: project,
+                        milestone: project.milestones[milestone_index],
+                        current_state: node.current_state.content
+      story.id = "pivotal-tracker-story-#{node.css('id').first.content}"
+      story.current_estimate = node.css('estimate').first.try(:content)
+      story.created_at = node.css('created_at').first.content
+      labels = node.css('labels').first.try(:content)
+      story.tags.unshift *labels.split(',') unless labels.blank?
+      story.theme = story.tags.size > 1 ? story.tags[0] : 'undefined'
+      story.actions = []
+      unless node.description.blank?
+        story.actions << (Action.new note: node.description)
       end
 
-      story.css('note').each do |note|
+      node.css('note').each do |note|
         #puts note.css('author').first.content
-        s.actions << (Action.new note: note.css('text').first.content, author: note.css('author').first.content, created_at: note.css('noted_at').first.content)
+        story.actions << (Action.new note: note.css('text').first.content, author: note.css('author').first.content, created_at: note.css('noted_at').first.content)
       end
 
-      states << s.current_state
+      pp story.as_json(methods: :actions) if index < 3
 
-      pp s.as_json(methods: :actions) if index < 7
+      story.save!
 
-      s.save!
+      project.stories << story
     end
 
-
-    #puts states.uniq.compact.sort
-    #render :xml => response.body
-    p
   end
 end

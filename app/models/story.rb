@@ -10,6 +10,7 @@ class Story
   has_many :stories
   belongs_to :project
   belongs_to :story
+  belongs_to :milestone
   embeds_many :actions
 
   def self.seed

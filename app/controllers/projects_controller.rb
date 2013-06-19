@@ -3,7 +3,6 @@ require 'pp'
 class ProjectsController < ApplicationController
 
   def new
-
   end
 
   def create
@@ -11,11 +10,8 @@ class ProjectsController < ApplicationController
     project_id = params[:project_id]
     project = PivotalTrackerImporter.new(project_id).import
     pp project
-    render nothing: true
+    redirect_to project
   end
-
-  #embeds_one :workflow
-
 
   def index
     respond_to do |format|
@@ -28,7 +24,7 @@ class ProjectsController < ApplicationController
   def show
     project = Project.find(params[:id])
     respond_to do |format|
-      format.json { render json: project.to_json(includes: :stories) }
+      format.json { render json: project.to_json(include: :stories) }
       format.html { render }
     end
   end

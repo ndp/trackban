@@ -12,6 +12,9 @@ app.factory "Project", ["$resource", ($resource) ->
   $resource("/projects/:id", {id: "@id"}, {update: {method: "PUT"}})
 ]
 
+@ProjectListCtrl = ["$scope", 'Project', ($scope, Project) ->
+  $scope.projects = Project.query()
+]
 
 @TrackbanCtrl = ["$scope", 'Project', "Story", ($scope, Project, Story) ->
 #  $scope.project = Project.get($scope.project_id)
@@ -31,7 +34,7 @@ app.factory "Project", ["$resource", ($resource) ->
   $scope.stories = Story.query (stories)->
     angular.forEach stories, (story) -> $scope.addStoryToEpoch(story)
 
-  $scope.projects = Project.query()
+#  $scope.projects = Project.query()
 
   $scope.themes = (stories)->
     themes = []
