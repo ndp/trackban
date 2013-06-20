@@ -1,19 +1,61 @@
-<h1>Trackban</h1>
-
-
-<div ng-app="Trackban" ng-controller="ProjectListCtrl">
-  <ul>
-    <li ng-repeat="project in projects">
-      <a href="/projects/{{project._id}}">{{project.name}}</a>
+<nav class="top-bar" style="">
+  <ul class="title-area">
+    <!-- Title Area -->
+    <li class="name">
+      <h1><a href="/">Trackban</a></h1>
     </li>
+    <!-- Remove the class "menu-icon" to get rid of menu icon. Take out "Menu" to just have icon alone -->
+    <li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
   </ul>
+
+
+  <!--<section class="top-bar-section">-->
+  <!--&lt;!&ndash; Right Nav Section &ndash;&gt;-->
+  <!--<ul class="right">-->
+  <!--<li class="divider"></li>-->
+  <!--<li class=""><a href="/grid.php">Features</a></li>-->
+  <!--<li class="divider"></li>-->
+  <!--<li class=""><a href="/templates.php">Add-ons</a></li>-->
+  <!--<li class="divider"></li>-->
+  <!--<li class=""><a href="/case-jacquelinewest.php">Case Studies</a></li>-->
+  <!--<li class="divider"></li>-->
+  <!--<li class=""><a href="/docs/">Docs</a></li>-->
+  <!--<li class="divider"></li>-->
+  <!--<li class=""><a href="/training.php">Training</a></li>-->
+  <!--<li class="divider"></li>-->
+  <!--<li class="has-form">-->
+  <!--<a href="http://foundation.zurb.com/docs" class="button">Getting Started</a>-->
+  <!--</li>-->
+  <!--</ul>-->
+  <!--</section>-->
+</nav>
+
+
+<div class="row">
+  <div class="large-6 columns">
+    <div ng-app="Trackban" ng-controller="ProjectListCtrl">
+      <ul>
+        <li ng-repeat="project in projects">
+          <a href="/projects/{{project._id}}">{{project.name}}</a>
+        </li>
+      </ul>
+    </div>
+
+  </div>
+  <div class="large-6 columns">
+    <%= form_for Project.new do |f| %>
+
+      <fieldset>
+        <legend>Import Project from Pivotal Tracker</legend>
+
+        <label>Pivotal Tracker Project ID</label>
+        <input type="text" placeholder="12345" name="project_id">
+        <button class="small button">Import</button>
+      </fieldset>
+    <% end %>
+  </div>
 </div>
 
-<div>
-  <h2>Import Project from Pivotal Tracker</h2>
-  <%= form_for Project.new do |f| %>
-    <label>Pivotal Tracker Project ID</label>
-    <input name="project_id">
-    <button>Import</button>
-  <% end %>
-</div>
+
+
+
