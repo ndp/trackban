@@ -69,7 +69,7 @@ class PivotalTrackerImporter
         project.milestones << milestone
       end
     end
-    project.milestones << Milestone.new(name: 'End of Project', project: project)
+    project.milestones << Milestone.create!(name: 'End of Project', project: project)
 
     milestone_index = 0
     doc.stories.story.each_with_index do |node, index|

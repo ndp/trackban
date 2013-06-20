@@ -9,20 +9,26 @@ app.factory "Story", ["$resource", ($resource) ->
 ] #epoch: unscheduled
 
 app.factory "Project", ["$resource", ($resource) ->
-  $resource("/projects/:id", {id: "@id"}, {update: {method: "PUT"}})
   $resource("/api/projects/:id", {id: "@id"}, {update: {method: "PUT"}})
+]
+
+app.factory "Milestone", ["$resource", ($resource) ->
+  $resource("/api/projects/:project_id/milestones/:id", {id: "@id", project_id: app.projectId}, {update: {method: "PUT"}})
 ]
 
 @ProjectListCtrl = ["$scope", 'Project', ($scope, Project) ->
   $scope.projects = Project.query()
 ]
 
-@TrackbanCtrl = ["$scope", 'Project', "Story", ($scope, Project, Story) ->
+@TrackbanCtrl = ["$scope", 'Project', "Story", 'Milestone', ($scope, Project, Story, Milestone) ->
 #  $scope.project = Project.get($scope.project_id)
   $scope.epochsHash = {}
   $scope.epochs = $.map ['past','present','future','undefined'], (name) ->
-    $scope.epochsHash[name] = {name: name, stories: [], themes: []}
+    $scope.epochsHash[name] = {name: name, stories: [], themes: [], milestones: {}}
 
+  # epochsHash['past']['stories']
+  # epochsHash['past']['themes']
+  # epochsHash['past']['milestones']
 
   $scope.addStoryToEpoch = (story) ->
 #    console.log 'addStoryToEpoch', story
@@ -31,6 +37,13 @@ app.factory "Project", ["$resource", ($resource) ->
     e.stories.push(story)
     e.themes.push(story.theme) if e.themes.indexOf(story.theme) == -1
 
+    if !e.milestones[story.milestone_id]
+      e.milestones[story.milestone_id] = { stories: [story], themes: [story.theme]}
+    else
+      e.milestones[story.milestone_id].stories.push(story)
+      e.milestones[story.milestone_id].themes.push(story.theme) if e.milestones[story.milestone_id].themes.indexOf(story.theme) == -1
+
+  $scope.milestones = Milestone.query()
 
   $scope.stories = Story.query (stories)->
     angular.forEach stories, (story) -> $scope.addStoryToEpoch(story)

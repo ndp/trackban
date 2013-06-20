@@ -4,6 +4,7 @@ Trackban::Application.routes.draw do
 
   namespace :api do
     resources :projects do
+      resources :milestones
       resources :stories, controller: :stories do
         resources :actions
       end
