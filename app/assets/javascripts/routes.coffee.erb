@@ -1,0 +1,27 @@
+root = global ? window
+angular = root.angular
+
+thisApp = angular.module("TrackbanClient", ['ngCookies', 'posts']).config(['$routeProvider', '$locationProvider' , 
+($routeProvider, $locationProvider) ->
+  #$locationProvider.hashPrefix('');
+  $locationProvider.html5Mode true
+  $routeProvider.when("/",
+    controller: "WelcomeCtrl"
+    templateUrl: "<%= asset_path('welcome/index.html') %>"
+  ).when("/posts", 
+    controller: PostsIndexCtrl
+    templateUrl: '<%= asset_path("posts/index.html") %>'
+  ).when("/posts/new",
+    controller: PostsCreateCtrl
+    templateUrl: '<%= asset_path("posts/new.html") %>'
+  ).when("/posts/:id",
+    controller: PostsShowCtrl
+    templateUrl: '<%= asset_path("posts/show.html") %>'
+  ).when("/posts/:id/edit",
+    controller: PostsEditCtrl
+    templateUrl: '<%= asset_path("posts/edit.html") %>'
+  ).otherwise redirectTo: "/"
+])
+
+root.thisApp = thisApp
+
