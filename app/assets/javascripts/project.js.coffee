@@ -5,11 +5,12 @@ app.projectId = 'pivotal-tracker-83'
 app.projectId = window.location.pathname.replace('/projects/','')
 
 app.factory "Story", ["$resource", ($resource) ->
-  $resource("/projects/:project_id/stories/:id", {id: "@id", project_id: app.projectId}, {update: {method: "PUT"}})
+  $resource("/api/projects/:project_id/stories/:id", {id: "@id", project_id: app.projectId}, {update: {method: "PUT"}})
 ] #epoch: unscheduled
 
 app.factory "Project", ["$resource", ($resource) ->
   $resource("/projects/:id", {id: "@id"}, {update: {method: "PUT"}})
+  $resource("/api/projects/:id", {id: "@id"}, {update: {method: "PUT"}})
 ]
 
 @ProjectListCtrl = ["$scope", 'Project', ($scope, Project) ->
