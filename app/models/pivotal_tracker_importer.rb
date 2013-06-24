@@ -72,11 +72,13 @@ class PivotalTrackerImporter
     project.milestones << Milestone.create!(name: 'End of Project', project: project)
 
     milestone_index = 0
+    story_count = 0
     doc.stories.story.each_with_index do |node, index|
       milestone_index += 1 and next if node.story_type.content == 'release'
       story = Story.new summary: node.css('name').first.content,
                         tags: [node.story_type.content],
                         project: project,
+                        position: story_count * 100,
                         milestone: project.milestones[milestone_index],
                         current_state: node.current_state.content
       story.id = "pivotal-tracker-story-#{node.css('id').first.content}"
@@ -98,6 +100,8 @@ class PivotalTrackerImporter
       pp story.as_json(methods: :actions) if index < 3
 
       story.save!
+
+      story_count += 1
 
       project.stories << story
     end

@@ -3,7 +3,7 @@ class Project
   include Mongoid::Timestamps
   field :name, type: String
   field :valid_estimates, type: Array
-  has_many :stories, dependent: :destroy
+  has_many :stories, dependent: :destroy, order: 'position ASC'
   has_many :milestones, dependent: :destroy
   embeds_many :workers
 
