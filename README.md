@@ -1,6 +1,7 @@
 == Vision & Goals
 
-Scrolling up and down to see a timeline of a project. The project is divided into epochs: past, present, future (and undefined ?).
+Scrolling up and down to see a timeline of a project.
+The project is divided into epochs: past, present, future (and undefined ?).
 
 Even less intrusive UX than Pivotal Tracker.
 
@@ -24,4 +25,44 @@ For example, scrolling into the past should facilitate retrospectives-- timeline
 Structure code to accept modules tools based on the epoch.
 
 Learn angular.js and MongoDB
+
+=== Grouping
+
+Stories may be grouped (possible views)
+
+Themes
+
+Stories
+
+Themes > Stories
+
+Milestones > Stories
+
+Milestones > Themes > Stories
+
+Themes > Milestones > Stories
+
+Epochs > Themes
+
+Epochs > Stories
+
+Epochs > Themes > Stories
+
+Epochs > Milestones > Stories
+
+Epochs > Milestones > Themes > Stories
+
+Epochs > Themes > Milestones > Stories
+
+Also Group by
+Tag
+Worker
+Estimate
+State
+
+group(stories) => [{group: 'story', values[{},{}]}]
+group(stories, :theme) => [{group: 'theme', values[{group: 'story', values: [{},{}]}]
+
+group(stories, :epoch, :milestone) => [{group: epoch, epoch: past, values[...]}, )
+
 
