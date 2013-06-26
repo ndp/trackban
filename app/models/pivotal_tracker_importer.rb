@@ -14,6 +14,10 @@ class PivotalTrackerImporter
   attr_reader :tracker_project_id
 
   def import
+
+    p = Project.where(id: "pivotal-tracker-#{tracker_project_id}").first
+    p.delete if p
+
     new_project = fetch_project
 
     fetch_stories(new_project)
