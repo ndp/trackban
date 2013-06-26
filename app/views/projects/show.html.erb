@@ -88,13 +88,8 @@
     <h2 id="{{epoch.name}}-hd">{{epoch.name}}</h2>
     <article ng-repeat="theme in epoch.themes">
       <h3>{{theme}}</h3>
-
-      <div style="max-height: 500px; overflow-y: auto; border: 1px dotted darkred">
-        <div ng-repeat="story in epoch.stories | filter: {theme: theme}">
-          <h4>{{story.summary}}</h4>
-          <h4>{{story.milestone.name}}</h4>
-          <!--<p>{{story.actions[0].note}}</p>-->
-        </div>
+      <div ng-repeat="story in epoch.stories | filter: {theme: theme}">
+        <story/>
       </div>
     </article>
   </section>
@@ -106,23 +101,23 @@
 
 <script type="text/javascript">
   setTimeout(function () {
-//    $('#past-hd').fixie({pinnedBodyClass: 'past-pinned', topMargin: 0});
-//    $('#present-hd').fixie({
-//      topMargin: h2ht,
-//      bottomMargin: h2ht * 2,
-//      pinSlop: 5,
-//      pinnedBodyClass: 'present-pinned'
-//    });
-//    $('#past-hd').fixie({
-//      topMargin: h2ht * 2,
-//      bottomMargin: h2ht * 1,
-//      pinSlop: -10,
-//      pinnedBodyClass: 'future-pinned'});
-//    $('#undefined-hd').fixie({
-//      topMargin: h2ht * 3,
-//      bottomMargin: 0,
-//      pinSlop: -20,
-//      pinnedBodyClass: 'undefined-pinned'
-//    });
-//  }, 3000);
+  //    $('#past-hd').fixie({pinnedBodyClass: 'past-pinned', topMargin: 0});
+  //    $('#present-hd').fixie({
+  //      topMargin: h2ht,
+  //      bottomMargin: h2ht * 2,
+  //      pinSlop: 5,
+  //      pinnedBodyClass: 'present-pinned'
+  //    });
+  //    $('#past-hd').fixie({
+  //      topMargin: h2ht * 2,
+  //      bottomMargin: h2ht * 1,
+  //      pinSlop: -10,
+  //      pinnedBodyClass: 'future-pinned'});
+  //    $('#undefined-hd').fixie({
+  //      topMargin: h2ht * 3,
+  //      bottomMargin: 0,
+  //      pinSlop: -20,
+  //      pinnedBodyClass: 'undefined-pinned'
+  //    });
+  //  }, 3000);
 </script>

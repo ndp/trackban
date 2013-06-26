@@ -4,6 +4,22 @@ app.projectId = '51b55205cd13fc3b9c00033c'
 app.projectId = 'pivotal-tracker-83'
 app.projectId = window.location.pathname.replace('/projects/','')
 
+
+app.directive 'story', () ->
+  {
+    restrict: 'E',
+    link: (scope, element) ->
+    template: '<h4>{{story.summary}}</h4>'
+  }
+
+# adds a class on hover
+app.directive 'hover', () ->
+  (scope, e, attrs) ->
+    e.bind 'mouseenter', ->
+      e.addClass(attrs.hover)
+    e.bind 'mouseleave', ->
+      e.removeClass(attrs.hover)
+
 app.factory "Story", ["$resource", ($resource) ->
   $resource("/api/projects/:project_id/stories/:id", {id: "@id", project_id: app.projectId}, {update: {method: "PUT"}})
 ] #epoch: unscheduled
@@ -47,6 +63,8 @@ app.factory "Milestone", ["$resource", ($resource) ->
 
   $scope.stories = Story.query (stories)->
     angular.forEach stories, (story) -> $scope.addStoryToEpoch(story)
+    $scope.hier = partitionIntoObjects stories, 'epoch', 'milestone_id', 'theme'
+    console.log $scope.hier
 
 #  $scope.projects = Project.query()
 

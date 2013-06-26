@@ -21,7 +21,7 @@
 #             ] },
 #           { group: 'MX', ...
 #
-partitionIntoObjects = (stories, groupings...) ->
+window.partitionIntoObjects = (stories, groupings...) ->
   groupings = [] if groupings == undefined
   if groupings.length == 0
     {
