@@ -61,6 +61,14 @@ app.factory "Milestone", ["$resource", ($resource) ->
 
   $scope.milestones = Milestone.query()
 
+  $scope.milestone = (milestoneId) ->
+    console.log 'find ', milestoneId, ' from ', $scope.milestones
+    _.find $scope.milestones, (milestone) ->
+      milestoneId == milestone._id
+
+  $scope.milestoneName = (milestoneId) ->
+    $scope.milestone(milestoneId)?.name or 'unresolved'
+
   $scope.stories = Story.query (stories)->
     angular.forEach stories, (story) -> $scope.addStoryToEpoch(story)
     $scope.hier = partitionIntoObjects stories, 'epoch', 'milestone_id', 'theme'
