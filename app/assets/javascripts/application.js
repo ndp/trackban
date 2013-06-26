@@ -13,7 +13,6 @@
 //= require jquery
 //= require jquery_ujs
 //= require foundation
-//= require csster
 //= require_tree ./angularjs/
 //= require_tree .
 
