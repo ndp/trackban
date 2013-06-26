@@ -36,8 +36,9 @@
       padding: '0 1%',
       'min-width': 200,
       'max-width': 400,
-      borderLeft: '1px solid #999',
-      borderRight: '1px solid #999',
+      paddingBottom: 20,
+//      borderLeft: '1px solid #999',
+//      borderRight: '1px solid #999',
       paddingTop: 0,
       '&:first-child': {
         marginLeft: 0
@@ -46,36 +47,49 @@
         width: '*',
         'max-width': 4000,
         marginRight: 0
+      },
+      'h4, p': {
+        'font-size': 'x-small',
+        padding: '2px 10px', margin: 0, color: 'white'
+      },
+      'h3': {
+        'font-size': 'x-small',
+        padding: '3px 0', margin: 0,
+        backgroundColor: '#333',
+        color: '#999'
       }
     },
-    'article h3': {
-      'font-size': 'x-small',
-      padding: 3, margin: 0,
-      backgroundColor: '#333',
-      color: '#999'
+    'h3.milestone': {
+      padding: '20px 0 10px 0',
+      margin: 0,
+      textAlign: 'center',
+      fontSize: 'small',
+      lineHeight: '1.0',
+      backgroundColor: 'rgba(0,0,0,1)',
+      color: 'white'
     },
-    'article h4, article p': {
-      'font-size': 'x-small',
-      padding: '2px 10px'
+    'h4.theme': {
+      fontSize: 'small',
+      textDecoration: 'underline'
     },
-    '#past': {
-      'background-color': 'black',
-      article: {
-        'background-color': '#111',
-        'color': '#999',
-      }
+    'section.epoch': {
+      paddingLeft: 40
+      },
+    '.epoch.past': {
+      background: 'url(/assets/textures/Colors_and_texture_of_a_brick_ground_artlibre_jnl.png)'
     },
-    '#present': {
-      'background-color': 'lightgreen',
-
+    '.epoch.present': {
+      background: 'url(/assets/textures/hazard-stripes-texture-lg.jpg)'
     },
-    '#future': {
-      'background-color': 'lightviolet',
-
+    '.epoch.future': {
+      background: 'url(/assets/textures/texture_leaves_by_kuschelirmel_stock.jpg)'
     },
-    '#undefined': {
-      'background-color': 'lightgray',
-
+    '.epoch.undefined': {
+      background: 'url(/assets/textures/Wallpaper-Texture-Texture-Smoke-Wreath-Ornaments-Wallpaper-Wallpapers.jpg)'
+    },
+    'article.theme': {
+      backgroundColor: 'rgba(0,0,0,.8)',
+      color: 'white'
     }
   });
 
@@ -84,13 +98,11 @@
 
 <div ng-app="Trackban" ng-controller="TrackbanCtrl">
 
-  <section id='m.group' ng-repeat='m in hier.values'>
-    <h3 id="{{m.group}}-hd">{{milestoneName(m.group)}}</h3>
-    <section id='e.group' ng-repeat='e in m.values'>
-      <h2 id="{{e.group}}-hd">{{e.group}}</h2>
-      <article id='th.group' ng-repeat='th in e.values'>
-        <h3 id="{{th.group}}-hd">{{th.group}}</h3>
-
+  <section ng-repeat='m in hier.values'>
+    <h3 class="milestone">{{milestoneName(m.group)}}</h3>
+    <section name='{{e.group}}' class="epoch {{e.group}}" ng-repeat='e in m.values'>
+      <article class="theme" ng-repeat='th in e.values'>
+        <h4 class="theme">{{th.group}}</h4>
         <div ng-repeat="story in th.values">
           <story/>
         </div>
