@@ -32,9 +32,9 @@ class PivotalTrackerImporter
     end
     doc = Nokogiri::Slop(response.body)
     existing_project = Project.where(id: "pivotal-tracker-#{tracker_project_id}").first
-    project = existing_project || Project.new(states: %w{unscheduled unstarted in_progress delivered finished accepted},
+    project = existing_project || Project.new(states: %w{unscheduled unstarted started delivered finished accepted},
                                               past_states: %w{accepted},
-                                              present_states: %w{in_progress delivered finished},
+                                              present_states: %w{started delivered finished},
                                               future_states: %w{unstarted}) do |p|
       p.id = 'pivotal-tracker-' << doc.project.id.content
     end
@@ -68,7 +68,7 @@ class PivotalTrackerImporter
         milestone = Milestone.new name: node.css('name').first.content,
                                   project: project,
                                   current_state: node.current_state.content
-        milestone.id = "pivotal-tracker-story-#{node.css('id').first.content}"
+        milestone.id = "pivotal-tracker-release-#{node.css('id').first.content}"
         milestone.save!
         project.milestones << milestone
       end
@@ -101,7 +101,7 @@ class PivotalTrackerImporter
         story.actions << (Action.new note: note.css('text').first.content, author: note.css('author').first.content, created_at: note.css('noted_at').first.content)
       end
 
-      pp story.as_json(methods: :actions) if index < 3
+      pp story.as_json(methods: :actions)# if index < 3
 
       story.save!
 

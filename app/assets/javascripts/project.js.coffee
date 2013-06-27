@@ -51,8 +51,19 @@ app.factory "Milestone", ["$resource", ($resource) ->
 
   $scope.partitions = ['milestone_id', 'epoch', 'theme']
 
+  $scope.groupSortFn = (group, values) ->
+    console.log 'groupSortFn', group, values
+    if (group == 'theme')
+      values.sort()
+    else if (group == 'epoch')
+      values.sort (a,b) ->
+        a1 = ['past','present','future','undefined'].indexOf(a)
+        b1 = ['past','present','future','undefined'].indexOf(b)
+        a1 > b1 ? -1 : 1
+
   $scope.stories = Story.query (stories)->
-    $scope.hier = partitionIntoObjects stories, $scope.partitions...
+    #    console.log stories
+    $scope.hier = partitionIntoObjects stories, $scope.groupSortFn, $scope.partitions...
 #    console.log $scope.hier
 
 #  $scope.projects = Project.query()

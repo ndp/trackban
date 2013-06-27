@@ -23,30 +23,40 @@
       opacity: .6
 
     },
-    'body.past-pinned section#past,body.present-pinned section#present,body.future-pinned section#future,body.undefined-pinned section#undefined': { borderTopWidth: h2ht, borderColor: '#999'},
+    'body.past-pinned section#past,body.present-pinned section#present,body.future-pinned section#future,body.undefined-pinned section#undefined': {
+      borderTopWidth: h2ht,
+      borderColor: '#999'
+    },
     section: {
       margin: '0',
-      'background-color': '#eee',
       padding: 0,
+      width: '100%',
+//      minHeight: 300,
+      overflow:'auto',
+      backgroundColor: '#eee',
       include: clearfix()
-
     },
     article: {
       display: 'table-cell',
-      padding: '0 1%',
+      padding: '0 1% 50px 1%',
+      margin: 0, // not used
       'min-width': 200,
-      'max-width': 400,
-      paddingBottom: 20,
-//      borderLeft: '1px solid #999',
-//      borderRight: '1px solid #999',
-      paddingTop: 0,
+//      'max-width': 400,
+      minHeight: 300,
+      borderLeft: '10px solid black',
       '&:first-child': {
         marginLeft: 0
       },
       '&:last-child': {
+//        width: '100%',
         width: '*',
-        'max-width': 4000,
+        maxWidth: 4000,
+        right: '0',
         marginRight: 0
+      },
+      '&.theme': {
+        backgroundColor: 'rgba(0,0,0,.7)',
+        color: 'white'
       },
       'h4, p': {
         'font-size': 'x-small',
@@ -73,23 +83,20 @@
       textDecoration: 'underline'
     },
     'section.epoch': {
-      paddingLeft: 40
-      },
+      paddingLeft: '3%',
+      width: '100%'
+    },
     '.epoch.past': {
       background: 'url(/assets/textures/Colors_and_texture_of_a_brick_ground_artlibre_jnl.png)'
     },
     '.epoch.present': {
-      background: 'url(/assets/textures/hazard-stripes-texture-lg.jpg)'
+      background: 'url(/assets/textures/honeycomb-texture.jpg)'
     },
     '.epoch.future': {
       background: 'url(/assets/textures/texture_leaves_by_kuschelirmel_stock.jpg)'
     },
-    '.epoch.undefined': {
+    '.epoch.undefined, body': {
       background: 'url(/assets/textures/Wallpaper-Texture-Texture-Smoke-Wreath-Ornaments-Wallpaper-Wallpapers.jpg)'
-    },
-    'article.theme': {
-      backgroundColor: 'rgba(0,0,0,.8)',
-      color: 'white'
     }
   });
 

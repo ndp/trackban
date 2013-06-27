@@ -1,5 +1,4 @@
 describe 'partitionIntoObjects', ->
-
   stories = null
 
   beforeEach ->
@@ -38,8 +37,8 @@ describe 'partitionIntoObjects', ->
       _.each result.values, (v) ->
         expect(v.groupBy).toBeUndefined()
     it 'has right stories', ->
-      expect(result.values[0].values).toEqual([stories[0],stories[1],stories[2],stories[5]])
-      expect(result.values[1].values).toEqual([stories[3],stories[4]])
+      expect(result.values[0].values).toEqual([stories[0], stories[1], stories[2], stories[5]])
+      expect(result.values[1].values).toEqual([stories[3], stories[4]])
 
   describe 'two-level grouping', ->
     result = null
@@ -86,3 +85,25 @@ describe 'partitionIntoObjects', ->
         it 'last level has no groupBy property', ->
           expect(tddNdpGroup.groupBy).toBeUndefined()
 
+
+  describe 'given a sort Fn', ->
+    sortFn = undefined
+    it 'returns data in values', ->
+      sortFn = jasmine.createSpy()
+      expect(partitionIntoObjects(stories, sortFn)).toEqual values: stories
+
+    it 'sorts first level', ->
+      sortFn = (group, values) ->
+        if group == 'theme'
+          values.sort()
+
+      result = partitionIntoObjects(stories, sortFn, 'theme')
+      expect(result.groupBy).toEqual('theme')
+      expect(result.values[0].group).toEqual('bdd')
+      expect(result.values[1].group).toEqual('tdd')
+
+    it 'sorts second level', ->
+      sortFn = jasmine.createSpy()
+      partitionIntoObjects(stories, sortFn, 'theme', 'worker')
+      expect(sortFn).toHaveBeenCalledWith('theme', [ 'tdd', 'bdd' ])
+      expect(sortFn).toHaveBeenCalledWith('worker', [ 'ndp', 'ndpair' ])
