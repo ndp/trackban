@@ -11,7 +11,6 @@ files = [
   JASMINE_ADAPTER,
   'app/assets/javascripts/underscore/underscore-min.js',
   'app/assets/javascripts/partition-into-objects.js.coffee',
-  'spec/javascripts/helpers/*',
   'spec/javascripts/browser/*'
 ];
 
