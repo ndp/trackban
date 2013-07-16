@@ -1,9 +1,16 @@
 app = angular.module("Trackban", ["ngResource"])
 
-app.projectId = '51b55205cd13fc3b9c00033c'
-app.projectId = 'pivotal-tracker-83'
 app.projectId = window.location.pathname.replace('/projects/','')
 
+app.directive 'distribute', ($parse) ->
+  {
+    restrict: 'A',
+    link: (scope, e, attrs) ->
+      a = attrs['distribute']
+      a = $parse(a)(scope)
+      percent = 100.0/ a.length
+      $(e).css 'width', "#{percent}%"
+  }
 
 app.directive 'story', () ->
   {
@@ -50,9 +57,10 @@ app.factory "Milestone", ["$resource", ($resource) ->
     $scope.milestone(milestoneId)?.name or 'unresolved'
 
   $scope.partitions = ['milestone_id', 'epoch', 'theme']
+  $scope.layoutKey = $scope.partitions.join('|')
 
   $scope.groupSortFn = (group, values) ->
-    console.log 'groupSortFn', group, values
+#    console.log 'groupSortFn', group, values
     if (group == 'theme')
       values.sort()
     else if (group == 'epoch')

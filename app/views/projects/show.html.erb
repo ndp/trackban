@@ -1,49 +1,78 @@
 <script type="text/javascript">
   var h2ht = 30;
+  var themePadding = 5;
+  Csster.addPropertyNames('box-sizing');
   Csster.style({
     html: {
-      'font-family': 'verdana',
       'overflow': 'scroll',
       'height': '100%'
     },
+    'body, h1,h2,h3,h4,h5,h6': {
+      fontFamily: '"Open Sans"',
+      fontWeight: '700'
+      },
     body: {
       margin: '0',
       padding: '0',
+      background: 'url(/assets/textures/Wallpaper-Texture-Texture-Smoke-Wreath-Ornaments-Wallpaper-Wallpapers.jpg)',
       'height': '100%'
     },
-    'h2': {
-      margin: '0',
-      'font-size': 'x-small',
-      'background-color': 'black',
-      color: 'white',
-      width: '100%',
-      padding: '0 20px',
-      height: h2ht,
-      lineHeight: h2ht,
-      opacity: .6
-
-    },
-    'body.past-pinned section#past,body.present-pinned section#present,body.future-pinned section#future,body.undefined-pinned section#undefined': {
-      borderTopWidth: h2ht,
-      borderColor: '#999'
-    },
-    section: {
+    'div.milestone': {
       margin: '0',
       padding: 0,
       width: '100%',
 //      minHeight: 300,
-      overflow:'auto',
+      overflow: 'auto',
       backgroundColor: '#eee',
-      include: clearfix()
+      boxSizing: 'border-box',
+      'h3.milestone': {
+        padding: '20px 0 10px 0',
+        margin: 0,
+        textAlign: 'center',
+        fontSize: 'medium',
+        lineHeight: '1.0',
+        backgroundColor: 'rgba(0,0,0,1)',
+        color: 'white'
+      }
     },
-    article: {
-      display: 'table-cell',
-      padding: '0 1% 50px 1%',
-      margin: 0, // not used
+    'div.epoch': {
+      margin: '0',
+      padding: 0,
+      width: '100%',
+//      minHeight: 300,
+      overflow: 'auto',
+      backgroundColor: '#eee',
+      boxSizing: 'border-box',
+      include: clearfix(),
+//      paddingLeft: '3%',
+      borderTop: '5px solid black',
+      borderBottom: '5px solid black',
+      '&.past': {
+        background: 'url(/assets/textures/Colors_and_texture_of_a_brick_ground_artlibre_jnl.png)'
+      },
+      '&.present': {
+        background: 'url(/assets/textures/honeycomb-texture.jpg)'
+      },
+      '&.future': {
+        background: 'url(/assets/textures/texture_leaves_by_kuschelirmel_stock.jpg)'
+      },
+      '&.undefined': {
+        background: 'url(/assets/textures/Wallpaper-Texture-Texture-Smoke-Wreath-Ornaments-Wallpaper-Wallpapers.jpg)'
+      }
+    },
+    'div.theme': {
+      display: 'block',
+      'float': 'left',
+      include: clearfix(),
+      margin: '0 -' + themePadding + 'px',
+      padding: '0 ' + themePadding + 'px 50px ' + themePadding + 'px',
       'min-width': 200,
 //      'max-width': 400,
       minHeight: 300,
       borderLeft: '10px solid black',
+      boxSizing: 'border-box',
+      backgroundColor: 'rgba(0,0,0,.7)',
+      color: 'white',
       '&:first-child': {
         marginLeft: 0
       },
@@ -54,69 +83,56 @@
         right: '0',
         marginRight: 0
       },
-      '&.theme': {
-        backgroundColor: 'rgba(0,0,0,.7)',
-        color: 'white'
-      },
       'h4, p': {
-        'font-size': 'x-small',
+        fontSize: 'medium',
         padding: '2px 10px', margin: 0, color: 'white'
       },
+      'h4.theme': {
+        fontSize: 'medium',
+        margin: '0 -' + themePadding + 'px',
+        padding: '3px ' + themePadding + 'px',
+        textAlign: 'center',
+        backgroundColor: 'rgba(0,0,0,.5)'
+      },
       'h3': {
-        'font-size': 'x-small',
+        fontSize: 'medium',
         padding: '3px 0', margin: 0,
         backgroundColor: '#333',
         color: '#999'
       }
     },
-    'h3.milestone': {
-      padding: '20px 0 10px 0',
-      margin: 0,
-      textAlign: 'center',
-      fontSize: 'small',
-      lineHeight: '1.0',
-      backgroundColor: 'rgba(0,0,0,1)',
-      color: 'white'
-    },
-    'h4.theme': {
-      fontSize: 'small',
-      textDecoration: 'underline'
-    },
-    'section.epoch': {
-      paddingLeft: '3%',
-      width: '100%'
-    },
-    '.epoch.past': {
-      background: 'url(/assets/textures/Colors_and_texture_of_a_brick_ground_artlibre_jnl.png)'
-    },
-    '.epoch.present': {
-      background: 'url(/assets/textures/honeycomb-texture.jpg)'
-    },
-    '.epoch.future': {
-      background: 'url(/assets/textures/texture_leaves_by_kuschelirmel_stock.jpg)'
-    },
-    '.epoch.undefined, body': {
-      background: 'url(/assets/textures/Wallpaper-Texture-Texture-Smoke-Wreath-Ornaments-Wallpaper-Wallpapers.jpg)'
+    '.stories': {
+//      include: clearfix()
     }
   });
 
 
 </script>
 
+<style>
+</style>
+
 <div ng-app="Trackban" ng-controller="TrackbanCtrl">
 
-  <section ng-repeat='m in hier.values'>
+  <select ng-model="layoutKey">
+    <option value="theme" selected={{ layoutKey==
+    'theme' }}>theme</option>
+    <option value="milestone_id|epoch|theme" selected={{ layoutKey==
+    'milestone_id|epoch|theme' }}>milestone|epoch|theme</option>
+  </select>
+
+  <div class="milestone" ng-repeat='m in hier.values'>
     <h3 class="milestone">{{milestoneName(m.group)}}</h3>
-    <section name='{{e.group}}' class="epoch {{e.group}}" ng-repeat='e in m.values'>
-      <article class="theme" ng-repeat='th in e.values'>
+
+    <div name='{{e.group}}' class="epoch {{e.group}}" ng-repeat='e in m.values'>
+      <div distribute='e.values' class="theme" ng-repeat='th in e.values'>
         <h4 class="theme">{{th.group}}</h4>
-        <div ng-repeat="story in th.values">
+        <div class="stories" ng-repeat="story in th.values">
           <story/>
         </div>
-      </article>
-    </section>
-  </section>
-
+      </div>
+    </div>
+  </div>
 </div>
 
 

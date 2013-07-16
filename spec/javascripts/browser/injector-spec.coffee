@@ -1,3 +1,4 @@
+# Copyright (c) 2013 Andrew J. Peterson, NDP Software
 fnTextWithoutComments = (fn) ->
   STRIP_COMMENTS = /((\/\/.*$)|(\/\*[\s\S]*?\*\/))/mg
   fn.toString().replace(STRIP_COMMENTS, '')
@@ -46,11 +47,11 @@ describe 'members', ->
     expect(members () -> {@foo, @bar, @foo}).toEqual(['foo','bar'])
 
 
-alarmService = ->
-  '!'
 sleepService = (n)->
   Array(n).join 'z'
 
+alarmService = ->
+  'beep'
 
 serviceLocator = (name) ->
   # Note, this could also be a factory provider or
@@ -73,23 +74,23 @@ describe 'angularStyle', ->
       fn.call(@, services...)
 
   it 'injects', ->
+    # Define a new service for the nighttime
+    # Dependencies are parameters to a function
+    # that returns the actual service
+    night = undefined
+    nightService = (alarmService, sleepService) ->
+      (i, awake) ->
+        night = "#{sleepService(i)} #{alarmService()} #{awake}"
+        i
+
     # Angular uses an injector, which has
     # access to all the services
     $inject = angularStyleInjector serviceLocator
 
-    night = undefined
-    # Define a new service for the nighttime
-    # Dependencies are parameters to a function
-    # that returns the actual service
-    nightService = $inject (alarmService, sleepService) ->
-      (i, awake) ->
-        night = @sleepService(i) + @alarmService() + awake
-        i
-
     # We can use our new service and it finds what it needs
-    result = nightService(7, ' yum')
+    result = ($inject nightService)(7, 'stretch')
     expect(result).toEqual(7)
-    expect(night).toEqual('zzzzzz! yum')
+    expect(night).toEqual('zzzzzz beep stretch')
 
 
 describe 'contextStyle', ->
@@ -109,16 +110,50 @@ describe 'contextStyle', ->
 
     # Define a new service for the nighttime
     # Dependencies referenced off of `this`
-    nightService = $inject (i,wake) ->
-      night = @sleepService(i) + @alarmService() + wake
+    nightService = (i,wake) ->
+      night = "#{@sleepService(i)} #{@alarmService()} #{wake}"
       i
 
     # We can use our new service and it finds what it needs
-    result = nightService(7, ' morning!')
+    result = ($inject nightService)(7, 'morning!')
     expect(result).toEqual(7)
-    expect(night).toEqual('zzzzzz! morning!')
+    expect(night).toEqual('zzzzzz beep morning!')
 
-describe 'objectStyle', ->
+describe 'context piggyBack Style', ->
+
+  contextStyleInjector = (serviceLocator) ->
+    (o) ->
+      fns = []
+      for name of o
+        fns.push o[name] if _.isFunction(o[name])
+      for fn in fns
+        serviceNames = members(fn)
+        for name in serviceNames
+          unless o[name]
+            service = serviceLocator(name)
+            o[name] = service if service
+      o
+
+
+  it 'injects', ->
+    night = undefined
+
+    # Member functions can be injected
+    o =
+      nightService: (i) ->
+        night = "#{@sleepService(i)} #{@alarmService()} #{@wake}"
+        i
+      wake: 'hello'
+
+
+    # We can use our new service and it finds what it needs
+    $inject = contextStyleInjector serviceLocator
+    $inject o
+    result = o.nightService(7)
+    expect(result).toEqual(7)
+    expect(night).toEqual('zzzzzz beep hello')
+
+describe 'objectStyle 2', ->
 
   objectStyleInjector = (serviceLocator) ->
     (o) ->
@@ -128,34 +163,34 @@ describe 'objectStyle', ->
       o
 
   it 'injects', ->
-    $inject = objectStyleInjector serviceLocator
 
     night = undefined
 
     # Define a new service for the nighttime
     # Dependencies referenced off of `this`
-    nightService = $inject {
+    nightService = {
       sleepService: (s) -> @sleepService = s
       alarmService: (s) -> @alarmService = s
       go: (i,wake) ->
-        night = @sleepService(i) + @alarmService() + wake
+        night = "#{@sleepService(i)} #{@alarmService()} #{wake}"
         i
     }
 
     # We can use our new service and it finds what it needs
-    result = nightService.go(7, ' morning!')
+    $inject = objectStyleInjector serviceLocator
+    result = ($inject nightService).go(7, 'morning!')
     expect(result).toEqual(7)
-    expect(night).toEqual('zzzzzz! morning!')
+    expect(night).toEqual('zzzzzz beep morning!')
 
-describe 'objectStyle 2', ->
+describe 'objectStyle 3', ->
 
-  objectStyleInjector = (serviceLocator) ->
-    injector = (o) ->
-      for p of o
-        if o[p] == injector
-          service = serviceLocator(p)
-          o[p] = service
-      o
+objectStyleInjector = (serviceLocator) ->
+  injector = (o) ->
+    for p of o
+      if o[p] == injector
+        service = serviceLocator(p)
+        o[p] = service
+    o
 
   $inject = objectStyleInjector serviceLocator
 
@@ -163,16 +198,16 @@ describe 'objectStyle 2', ->
   it 'injects', ->
     night = undefined
 
-    nightService = $inject {
+    nightService = {
       sleepService: $inject
       alarmService: $inject
       report: (i,wake) ->
-        night = @sleepService(i) + @alarmService() + wake
+        night = "#{@sleepService(i)} #{@alarmService()} #{wake}"
         i
     }
 
 
     # We can use our new service and it finds what it needs
-    result = nightService.report(7, ' morning!')
+    result = ($inject nightService).report(7, 'morning!')
     expect(result).toEqual(7)
-    expect(night).toEqual('zzzzzz! morning!')
+    expect(night).toEqual('zzzzzz beep morning!')

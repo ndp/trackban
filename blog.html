@@ -1,0 +1,156 @@
+I think I missed the memo:  "Don't test private methods." 
+
+In the Ruby community, where I mostly forage, excellent blog posts like
+<a href="http://blog.rubybestpractices.com/posts/gregory/034-issue-5-testing-antipatterns.html">this</a>
+seem to have become accepted best practice (or in this case, <a href="http://lostechies.com/chadmyers/2008/11/21/do-not-test-private-methods/">dogma</a>).
+I'm surprised how <a href="http://nicksda.apotomo.de/2011/09/private-methods-to-test-or-not-to-test/">little resistance</a>
+it's received (especially given how wrong it is!).
+Since Ruby makes calling private methods so easy-- and therefore testing private methods
+"tempting"-- I'll focus on it, instead of Java or Javascript.
+
+tl;dr private is meaningless in Ruby; there is plenty of value in white box testing; testing private methods can produce a better design; testing private methods can be more concise and clear.
+
+What's Private Anyhow?
+
+Private, and other access restrictions are to give consumers of a class a hint about how
+it should be used. And if they miss the hint, the compiler/interpreter will
+reject the code if they ignore the hint.
+
+Ruby's private does this.
+As a comparison, though, Java provides four access rules: public, protected, default, and private.
+You can have a method private to a class only, itself and subclasses, or itself, subclasses
+and other classes within the package (similar to a Ruby module).
+In addition, classes themselves can be private, and there are "Inner Classes",
+with their own access rules.
+C++ offers even more control: "friends" that can be granted access to individual elements,
+in a ACL style.
+It also offers separate include files to declare interfaces to classes, so with some
+work, fine grain control is available.
+
+Wow, what happened Ruby? Ruby offers only a "semi-private" access, that is easily defeated.
+Ruby just isn't really about
+restricting access, and it includes these restrictions reluctantly (my opinion only).
+
+And finally, to Ruby.
+It sometimes offers a hint at intent, but offers none of the richness of the
+other languages, and in generally it's not relied upon.
+In fact, "private" is not a very Ruby concept. Ruby is pretty open, as in,
+if you can find it and understand it, have at it.
+To help hint at APIs, packages often have API-oriented classes,
+composed of what would be the private aspects in a different languages.
+Or give up and use comments instead of the private keyword
+(http://www.peterprovost.org/blog/2012/05/31/my-take-on-unit-testing-private-methods).
+Non-public stuff is often shoved into modules to make them a little more "private".
+So in the end, the keyword private in Ruby isn't that meaningful.
+
+
+Reason #1: Only Test the API!
+
+Q.A. terminology defines white and black box testing. Black box
+testing treats it subject as a "black box", ignorant of the implementation details.
+
+White box testing can examine the code to guide the writing of tests.
+One might even instrument code so its easier to duplicate a complex situation.
+It's basically going beyond the "public" api. And white box
+testing is used to gain efficiency in the overall Q.A. effort. If the
+tester knows how the code is structured, she can identify
+inputs that go through the same code path-- and
+efficiently implement only the needed ones. This was true 20 years ago
+        in Q.A., and is true today in automated tests.
+
+Both approaches have their place in a Q.A. strategy. So it seems arbitrary
+to declare that
+white box testing should not be used.
+
+
+Reason #2: It's not BDD!
+
+Philosophical objections reiterate the BDD vs. TDD mantra-- test the public
+behavior of what your code accomplishes, not how it gets it done.
+This is a fine philosophy, but sometimes impractical in the real world.
+A simple example is an API call to an external service. Let's say my code
+provides a nice embroidery api call to its users. A simple call will do
+some processing and then call out to a web service that does the work:
+
+  def make_it_sew(direction, stitch, distance, callback)
+      # complicated processing
+      http.post op_code, other_value_calculated_from_arguments ->  { callback }
+  end
+
+It's a little awkward, but that's my API-- and the only public part of my code.
+Saying I can only test public methods makes this hard. (Let's put aside integration test for the moment.)
+
+A unit test could stub out the call to the external service, but and we
+can assert our callback is called correctly. But this is insufficient,
+and in order to have any sort of good test coverage, I'll want to assert
+that what is actually posted is correct, running through a bunch of test cases
+for different directions, stitches, etc. This starts to violate the BDD philosophy,
+though, since we're testing how the code actually works.
+
+So there are a couple possibilities here:
+
+We could create a new,
+separate method out of the "complicated processing" above.
+This would leave make_it_sew with no branches, two lines, and easily tested.
+Also, we can easy unit test functionality more easily. This will create
+much nicer looking and simpler and probably complete unit tests.
+
+This new method should be private-- this is an internal refactor and
+we don't want to expose it to the client. But the whole point is to test it,
+so if we're not allowed to test private methods, we can't do that. Dang.
+
+So alternatively, we can pull out all this processing into a separate class http://lassekoskela.com/thoughts/24/test-everything-but-not-private-methods/ , let's say:
+
+class ComplictedProcessingToPreparePost
+   def initialize(direction, stitch, distance)
+     ..
+   end
+   def calculate_post_params()
+     return op_code, other_value_calculated_from_arguments
+   end
+end
+
+Now we have a separate class where we can really stretch out and breath. We can break the complicated pieces of the calculations down and unit test them in isolation as much as we want. Problem solved.
+
+But this is ridiculous. We're just replaced a private method with a public class. In some cases this may lead to a better design-- but it's hard to argue that in the abstract. If this code is specific to the http call and not complicated, we have increased the overall complexity of the system.
+
+There are ways to ameliorate the additional complexity. Let's put the class inside the original class, next to the api, as a nested class. To be honest, this doesn't really help matters much.
+
+
+The only valuable tests test the public interface to your code.
+
+
+
+
+Make refactoring harder. The claim is that with tests testing private methods, it would be harder to rewrite them to be better even though the external API remains the same.  
+
+
+I think what we're really saying is not Don't test your private methods, but don't write em in the first place.
+
+
+See stackoverflow.com/questions/215497
+
+Is it more important
+
+
+
+http://www.peterprovost.org/blog/2012/05/31/my-take-on-unit-testing-private-methods
+http://lassekoskela.com/thoughts/24/test-everything-but-not-private-methods/
+http://lostechies.com/chadmyers/2008/11/21/do-not-test-private-methods/
+http://programmers.stackexchange.com/questions/100959/how-do-you-unit-test-private-methods
+
+
+We see some tools to help to give us some tools to deal with this flexibility, such as Rail's attr_accessible, giving your a coarse "no, you're not supposed to do that." In the end, though, code running in the Ruby VM is consider a "friendly", and it would be nearly impossible to change that at this point. Hence the recent rash of security vulnerabilities all had to do with libraries allowing some friend-of-a-friend execute raw Ruby code. Even though I'm good friends with JayZ from high school, there's some friends I shouldn't bring over to his house and let them roam the halls.  
+
+
+
+
+Javascript offers no access rights, although I'm glad the underline _ has
+become a convention to mean private (a C++ style). Of course things
+can be hidden from run-time access via closures, but this misses
+half the goal. "private" communicates the intent about the intended usage,
+but hiding stuff in closers is awkward, and often makes the
+actual API code harder to see. After untangling some pseudoclassical code
+I often imagine the author smugly smiling, "See, I told you I could
+make that private". I'm much prefer that author to focus on
+providing a readable API.
